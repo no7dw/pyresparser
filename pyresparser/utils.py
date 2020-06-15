@@ -17,7 +17,35 @@ from pdfminer.pdfpage import PDFPage
 from pdfminer.pdfparser import PDFSyntaxError
 from nltk.stem import WordNetLemmatizer
 from nltk.corpus import stopwords
+import jieba
 
+default_stopwords_path = '/Users/dengwei/projects/github/no7dw/jdcv/res/stop_words.txt'  # 停用词词表
+
+class NLP:
+    def get_all_stop_words(self, path):
+        def stopwords_list( stopwords_path):
+            f_stop = open(stopwords_path)
+            try:
+                f_stop_text = f_stop.read( )
+            finally:
+                f_stop.close( )
+            f_stop_seg_list=f_stop_text.split('\n')
+            return f_stop_seg_list
+            
+        all = []
+        all.extend(stopwords_list(default_stopwords_path))
+        all.extend(stopwords_list(path))
+        return all
+
+    def jiebaclearText(self, text, all_stop_words=''):
+        mywordlist = []
+        seg_list = jieba.cut(text, cut_all=False, HMM=True)
+        liststr="/ ".join(seg_list)
+        f_stop_seg_list=all_stop_words
+        for myword in liststr.split('/'):
+            if not(myword.strip() in f_stop_seg_list) and len(myword.strip())>1:
+                mywordlist.append(myword)
+        return ''.join(mywordlist)
 
 def extract_text_from_pdf(pdf_path):
     '''
@@ -169,6 +197,7 @@ def extract_text(file_path, extension):
         text = extract_text_from_docx(file_path)
     elif extension == '.doc':
         text = extract_text_from_doc(file_path)
+    text = NLP().jiebaclearText(text)    
     return text
 
 
@@ -403,7 +432,6 @@ def extract_skills(nlp_text, noun_chunks, skills_file=None):
     for token in tokens:
         if token.lower() in skills:
             skillset.append(token)
-
     # check for bi-grams and tri-grams
     for token in noun_chunks:
         token = token.text.lower().strip()
