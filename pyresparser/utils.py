@@ -19,33 +19,6 @@ from nltk.stem import WordNetLemmatizer
 from nltk.corpus import stopwords
 import jieba
 
-default_stopwords_path = '/Users/dengwei/projects/github/no7dw/jdcv/res/stop_words.txt'  # 停用词词表
-
-class NLP:
-    def get_all_stop_words(self, path):
-        def stopwords_list( stopwords_path):
-            f_stop = open(stopwords_path)
-            try:
-                f_stop_text = f_stop.read( )
-            finally:
-                f_stop.close( )
-            f_stop_seg_list=f_stop_text.split('\n')
-            return f_stop_seg_list
-            
-        all = []
-        all.extend(stopwords_list(default_stopwords_path))
-        all.extend(stopwords_list(path))
-        return all
-
-    def jiebaclearText(self, text, all_stop_words=''):
-        mywordlist = []
-        seg_list = jieba.cut(text, cut_all=False, HMM=True)
-        liststr="/ ".join(seg_list)
-        f_stop_seg_list=all_stop_words
-        for myword in liststr.split('/'):
-            if not(myword.strip() in f_stop_seg_list) and len(myword.strip())>1:
-                mywordlist.append(myword)
-        return ''.join(mywordlist)
 
 def extract_text_from_pdf(pdf_path):
     '''
@@ -180,6 +153,18 @@ def extract_text_from_doc(doc_path):
     except KeyError:
         return ' '
 
+def jiebaclearText(text, all_stop_words=''):
+    
+    mywordlist = ''
+    seg_list = jieba.cut(text, cut_all=False, HMM=True)
+    f_stop_seg_list=all_stop_words
+    for myword in seg_list:
+        if not(myword.strip() in f_stop_seg_list) and len(myword.strip())>1:
+            mywordlist = mywordlist + ' ' + myword
+    return mywordlist
+
+def lang(text):
+    return 'zhn'
 
 def extract_text(file_path, extension):
     '''
@@ -197,7 +182,9 @@ def extract_text(file_path, extension):
         text = extract_text_from_docx(file_path)
     elif extension == '.doc':
         text = extract_text_from_doc(file_path)
-    text = NLP().jiebaclearText(text)    
+
+    if lang(text) == 'zhn' :        
+        text = jiebaclearText(text)    
     return text
 
 
