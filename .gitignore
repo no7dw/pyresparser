@@ -105,3 +105,4 @@ venv.bak/
 
 pytest/cv-pdf
 *.csv
+.DS_Store
