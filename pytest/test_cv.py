@@ -1,6 +1,6 @@
 from pyresparser import ResumeParser
 import unittest
-import jdcv 
+# import jdcv 
 
 class TestCV(unittest.TestCase):
 
